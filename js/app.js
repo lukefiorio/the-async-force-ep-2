@@ -3,17 +3,16 @@
 function getResources() {
   contentContainer.innerHTML = '';
 
-  const displayError = function(self) {
+  const displayError = function(status, response) {
     // remove attr1,2,3 (necessary due to hoisting)
     contentContainer.innerHTML = '';
     // create & append error message
     let error = document.createElement('h2');
     let errorDetail = document.createElement('p');
     error.innerHTML = 'Oops! Looks like something went wrong.';
-    errorDetail.innerHTML = `error ${self.status}: ${JSON.parse(self.responseText).detail}`;
+    errorDetail.innerHTML = `error ${status}: ${JSON.parse(response).detail}`;
     contentContainer.appendChild(error);
     error.appendChild(errorDetail);
-    return;
   };
 
   const swapi = 'https://swapi.co/api/';
@@ -21,19 +20,17 @@ function getResources() {
   const attr1 = document.createElement('h2');
   const attr2 = document.createElement('p');
   const attr3 = document.createElement('p');
-  const filmList = document.createElement('li');
   contentContainer.appendChild(attr1);
   contentContainer.appendChild(attr2);
   contentContainer.appendChild(attr3);
-  contentContainer.appendChild(filmList);
 
   if (resourceType.value === 'people') {
     function peopleXmlListener() {
       if (this.status < 200 || this.status >= 300) {
-        displayError(this);
+        displayError(this.status, this.responseText);
+        return;
       }
-      //no film list for 'people'
-      filmList.outerHTML = '';
+
       attr1.innerHTML = JSON.parse(this.responseText).name;
       attr2.innerHTML = JSON.parse(this.responseText).gender;
 
@@ -54,13 +51,16 @@ function getResources() {
   } else if (resourceType.value === 'planets') {
     function planetXmlListener() {
       if (this.status < 200 || this.status >= 300) {
-        displayError(this);
+        displayError(this.status, this.responseText);
+        return;
       }
 
       attr1.innerHTML = JSON.parse(this.responseText).name;
       attr2.innerHTML = JSON.parse(this.responseText).terrain;
       attr3.innerHTML = JSON.parse(this.responseText).population;
 
+      const filmList = document.createElement('li');
+      contentContainer.appendChild(filmList);
       let filmsArray = JSON.parse(this.responseText).films;
       filmList.innerHTML = 'Referenced in:';
 
@@ -85,13 +85,16 @@ function getResources() {
   } else if (resourceType.value === 'starships') {
     function starshipXmlListener() {
       if (this.status < 200 || this.status >= 300) {
-        displayError(this);
+        displayError(this.status, this.responseText);
+        return;
       }
 
       attr1.innerHTML = JSON.parse(this.responseText).name;
       attr2.innerHTML = JSON.parse(this.responseText).manufacturer;
       attr3.innerHTML = JSON.parse(this.responseText).starship_class;
 
+      const filmList = document.createElement('li');
+      contentContainer.appendChild(filmList);
       let filmsArray = JSON.parse(this.responseText).films;
       filmList.innerHTML = 'Referenced in:';
 
